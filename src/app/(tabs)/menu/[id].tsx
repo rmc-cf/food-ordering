@@ -10,6 +10,12 @@ const ProductDetailsScreen = () => {
   const {id} = useLocalSearchParams();
   const [selectedSize,setSelectedSize] = useState('M')
   const product = products.find(p=>p.id.toString()===id)
+  
+  const addToCart = ()=>{
+    console.log('====================================');
+    console.log('adding to cart',selectedSize);
+    console.log('====================================');
+  }
   if(!product){
     return <Text>Product not found</Text>
   }
@@ -42,7 +48,7 @@ const ProductDetailsScreen = () => {
       <Text style={styles.price}>
         ${product.price}
         </Text>
-        <Button text='Add to cart'/>
+        <Button  onPress={addToCart} text='Add to cart'/>
     </View>
 
   )
@@ -77,7 +83,8 @@ const styles = StyleSheet.create({
   },
   price:{
     fontSize:18,
-    fontWeight:'bold'
+    fontWeight:'bold',
+    marginTop:'auto'
   }
 })
 export default ProductDetailsScreen
