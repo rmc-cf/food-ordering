@@ -1,9 +1,9 @@
-import { View, Text, TextInput, StyleSheet, Alert } from 'react-native';
-import React, { useState } from 'react';
-import Colors from '../../constants/Colors';
-import { Link, Stack } from 'expo-router';
 import Button from '@/src/components/custom/Button';
-// import { supabase } from '@/lib/supabase';
+import { supabase } from '@/src/lib/supabase';
+import { Link, Stack } from 'expo-router';
+import React, { useState } from 'react';
+import { Alert, StyleSheet, Text, TextInput, View } from 'react-native';
+import Colors from '../../constants/Colors';
 
 const SignUpScreen = () => {
   const [email, setEmail] = useState('');
@@ -12,9 +12,9 @@ const SignUpScreen = () => {
 
   async function signUpWithEmail() {
     setLoading(true);
-    // const { error } = await supabase.auth.signUp({ email, password });
+    const { error } = await supabase.auth.signUp({ email, password });
 
-    // if (error) Alert.alert(error.message);
+    if (error) Alert.alert(error.message);
     setLoading(false);
   }
 
