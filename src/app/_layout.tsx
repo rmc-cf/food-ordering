@@ -6,12 +6,12 @@ import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 
 import { useColorScheme } from '@/src/components/useColorScheme';
+import AuthProvider from '../providers/AuthProvider';
 import CartProvider from '../providers/CartProvider';
-import { ScrollView } from 'react-native';
 
 export {
   // Catch any errors thrown by the Layout component.
-  ErrorBoundary,
+  ErrorBoundary
 } from 'expo-router';
 
 export const unstable_settings = {
@@ -51,15 +51,17 @@ function RootLayoutNav() {
 
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <CartProvider>
-
+      <AuthProvider>
+        <CartProvider>
           <Stack>
             <Stack.Screen name="(admin)" options={{ headerShown: false }} />
             <Stack.Screen name="(user)" options={{ headerShown: false }} />
             <Stack.Screen name="(auth)" options={{ headerShown: false }} />
             <Stack.Screen name="cart" options={{ presentation: 'modal' }} />
           </Stack>
-      </CartProvider>
+        </CartProvider>
+      </AuthProvider>
     </ThemeProvider>
   );
 }
+
