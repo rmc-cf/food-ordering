@@ -1,18 +1,37 @@
-import { View, Text, StyleSheet, TextInput, Image, Alert } from 'react-native'
-import React, { useState } from 'react'
-import Button from '@/src/components/custom/Button'
 import { defaultPizzaImage } from '@/assets/data/products'
+import { useDeleteProduct, useInsertProduct, useProduct, useUpdateProduct } from '@/src/api/products'
+import Button from '@/src/components/custom/Button'
 import Colors from '@/src/constants/Colors'
-import * as ImagePicker from 'expo-image-picker';
-import { Stack, useLocalSearchParams } from 'expo-router'
+import * as ImagePicker from 'expo-image-picker'
+import { Stack, useLocalSearchParams, useRouter } from 'expo-router'
+import React, { useEffect, useState } from 'react'
+import { Alert, Image, StyleSheet, Text, TextInput, View } from 'react-native'
 const CreateProductScreen = () => {
        const [name, setName] = useState('')
        const [price, setPrice] = useState('')
        const [errors, setErrors] = useState('')
-       const [image, setImage] = useState<string|null>(null)
-      
-       const {id} = useLocalSearchParams()
+       const [image, setImage] = useState<string | null>(null)
+
+       const { id: idString } = useLocalSearchParams()
+       const id = parseFloat(typeof idString === 'string' ? idString : idString?.[0])
+
        const isUpdating = !!id
+
+       const { mutate: insertProduct } = useInsertProduct()
+       const { mutate: updateProduct } = useUpdateProduct()
+       const { data: updatingProduct } = useProduct(id)
+       const {mutate:deleteProduct} = useDeleteProduct()
+       const router = useRouter()
+
+
+       useEffect(() => {
+              if (updatingProduct){
+                     setName(updatingProduct.name)
+                     setPrice(updatingProduct.price.toString())
+                     setImage(updatingProduct.image)
+              }
+       }, [updatingProduct])
+
        const resetFields = () => {
               setName('')
               setPrice('')
@@ -32,10 +51,10 @@ const CreateProductScreen = () => {
               }
               return true
        }
-       const onSubmit = ()=>{
-              if(isUpdating){
+       const onSubmit = () => {
+              if (isUpdating) {
                      onUpdateCreate()
-              }else{
+              } else {
                      onCreate()
               }
        }
@@ -44,15 +63,33 @@ const CreateProductScreen = () => {
                      return;
               }
               //resolve the database
-              console.warn('Creating product');
-              resetFields()
+              updateProduct({
+                     id,
+                     name,
+                     price: parseFloat(price),
+                     image
+              },
+                     {
+                            onSuccess: () => {
+                                   resetFields()
+                                   router.back()
+                            }
+                     }
+              )
        }
        const onCreate = () => {
               if (!validateInput()) {
                      return;
               }
-              //resolve the database
-              console.warn('Creating product');
+              insertProduct(
+                     { name, price: parseFloat(price), image },
+                     {
+                            onSuccess: () => {
+                                   resetFields()
+                                   router.back()
+                            }
+                     }
+              )
               resetFields()
        }
        const pickImage = async () => {
@@ -70,31 +107,36 @@ const CreateProductScreen = () => {
                      setImage(result.assets[0].uri);
               }
        };
-       const onDelete = ()=>{
-
+       const onDelete = () => {
+              deleteProduct(id, {
+                     onSuccess: () => {
+                            resetFields()
+                            router.replace('/(admin)')
+                     }
+              })
        }
-       const confirmDelete = ()=>{
-              Alert.alert('Confirm','Are you sure you want to delete this product',[
+       const confirmDelete = () => {
+              Alert.alert('Confirm', 'Are you sure you want to delete this product', [
                      {
-                            text:'Cancel',
+                            text: 'Cancel',
                      },
                      {
-                            text:'Delete',
-                            style:'destructive',
-                            onPress:onDelete
+                            text: 'Delete',
+                            style: 'destructive',
+                            onPress: onDelete
                      }
               ])
        }
        return (
               <View style={styles.container}>
                      <Stack.Screen
-                     options={{
-                            title:isUpdating?
-                            'Update Product':'Create Product'
-                     }}/>
+                            options={{
+                                   title: isUpdating ?
+                                          'Update Product' : 'Create Product'
+                            }} />
                      <Image
-                            source={{ 
-                                   uri: image||defaultPizzaImage 
+                            source={{
+                                   uri: image || defaultPizzaImage
                             }}
                             style={styles.image}
                      />
@@ -118,16 +160,16 @@ const CreateProductScreen = () => {
                      />
                      <Text style={{ color: 'red' }}
                      >{errors}</Text>
-                     <Button onPress={onSubmit} text={isUpdating?'Update':'Create'} />
-                            {
-                                   isUpdating&&(
-                                          <Text onPress={confirmDelete}
+                     <Button onPress={onSubmit} text={isUpdating ? 'Update' : 'Create'} />
+                     {
+                            isUpdating && (
+                                   <Text onPress={confirmDelete}
                                           style={styles.textButton}
-                                          >
-                                                 Delete
-                                          </Text>
-                                   )
-                            }
+                                   >
+                                          Delete
+                                   </Text>
+                            )
+                     }
               </View>
        )
 }
