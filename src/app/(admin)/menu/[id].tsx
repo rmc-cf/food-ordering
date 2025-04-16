@@ -1,11 +1,13 @@
 import { defaultPizzaImage } from '@/assets/data/products';
 import { useProduct } from '@/src/api/products';
 import Colors from '@/src/constants/Colors';
+import { Tables } from '@/src/types';
 import { FontAwesome } from '@expo/vector-icons';
 import { Link, Stack, useLocalSearchParams } from 'expo-router';
 import React from 'react';
 import { ActivityIndicator, Image, Pressable, StyleSheet, Text, View } from 'react-native';
 
+type Product  = Tables<'products'>
 
 const ProductDetailsScreen = () => {
   const { id: idString } = useLocalSearchParams();
@@ -15,6 +17,7 @@ const ProductDetailsScreen = () => {
 
   if (isLoading) return <ActivityIndicator />
   if (error) return <Text>Failed to fetch products</Text>
+  if (!product) return <Text>Product not found</Text>
   return (
     <View style={styles.container}>
       <Stack.Screen
