@@ -17,7 +17,7 @@ export default function OrderListNavigator() {
                             title:'Active'
                             }}
                             />
-                         
+                          
                             </TopTabs>
               </SafeAreaView>
        )

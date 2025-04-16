@@ -1,12 +1,12 @@
-import { View, Text, Platform, FlatList } from 'react-native'
-import React, { useContext } from 'react'
 import { StatusBar } from 'expo-status-bar'
-import {  useCart } from '../providers/CartProvider'
-import CartListItem from '../components/custom/CartListItem'
+import React from 'react'
+import { FlatList, Platform, Text, View } from 'react-native'
 import Button from '../components/custom/Button'
+import CartListItem from '../components/custom/CartListItem'
+import { useCart } from '../providers/CartProvider'
 
 const cart = () => {
-       const {items,total} = useCart()
+       const {items,total,checkout} = useCart()
   return (
     <View>
        <FlatList 
@@ -15,7 +15,7 @@ const cart = () => {
        contentContainerStyle={{gap:10}}
        />
        <Text style={{marginTop:20,fontSize:20,fontWeight:'500'}}>${total}</Text>
-       <Button text='Checkout'/>
+       <Button onPress={checkout} text='Checkout'/>
       <StatusBar style={Platform.OS==='ios'?'light':'auto'}/>
     </View>
   )
