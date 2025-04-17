@@ -2,7 +2,8 @@ import { defaultPizzaImage } from "@/assets/data/products";
 import Colors from "@/src/constants/Colors";
 import { Tables } from "@/src/types";
 import { Link, useSegments } from "expo-router";
-import { Image, Pressable, StyleSheet, Text } from "react-native";
+import { Pressable, StyleSheet, Text } from "react-native";
+import RemoteImage from "./RemoteImage";
 
 
 type ProductListItemProps = {
@@ -14,9 +15,11 @@ const ProductListItem = ({ product }: ProductListItemProps) => {
               //作为孩子
               <Link href={`/${segments[0] as  "(admin)" | "(user)" }/menu/${product.id}`} asChild>
                      <Pressable style={styles.container}>
-                            <Image source={{ uri: product.image || defaultPizzaImage }}
-                                   style={styles.image}
-                                   resizeMode="contain"
+                            <RemoteImage 
+                            path={product.image}
+                            fallback={defaultPizzaImage}
+                            style={styles.image}
+                            resizeMode="contain"
                             />
                             <Text style={styles.title}>{product.name}</Text>
                             <Text style={styles.price}>${product.price}</Text>

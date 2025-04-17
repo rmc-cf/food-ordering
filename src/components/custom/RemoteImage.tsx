@@ -1,6 +1,6 @@
+import { supabase } from '@/src/lib/supabase';
 import React, { ComponentProps, useEffect, useState } from 'react';
 import { Image } from 'react-native';
-import { supabase } from '../lib/supabase';
 
 type RemoteImageProps = {
   path?: string | null;

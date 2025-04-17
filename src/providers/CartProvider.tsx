@@ -61,13 +61,13 @@ const CartProvider = ({ children }: PropsWithChildren) => {
               insertOrder({ total }, { onSuccess: saveOrderItems })
        }
        const saveOrderItems = (order: Tables<'orders'>) => {
-              const item1 = items[0]
-              insertOrderItems({
+             const orderItems = items.map((cartItem) => ({
                      order_id: order.id,
-                     product_id: item1.product_id,
-                     size: item1.size,
-                     quantity: item1.quantity,
-              }, {
+                     product_id: cartItem.product_id,
+                     size: cartItem.size,
+                     quantity: cartItem.quantity,
+              }))
+              insertOrderItems(orderItems, {
                      onSuccess() {
                             console.log('====================================');
                             console.log(order);

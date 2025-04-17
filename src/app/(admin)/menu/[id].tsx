@@ -1,11 +1,12 @@
 import { defaultPizzaImage } from '@/assets/data/products';
 import { useProduct } from '@/src/api/products';
+import RemoteImage from '@/src/components/custom/RemoteImage';
 import Colors from '@/src/constants/Colors';
 import { Tables } from '@/src/types';
 import { FontAwesome } from '@expo/vector-icons';
 import { Link, Stack, useLocalSearchParams } from 'expo-router';
 import React from 'react';
-import { ActivityIndicator, Image, Pressable, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
 
 type Product  = Tables<'products'>
 
@@ -41,8 +42,12 @@ const ProductDetailsScreen = () => {
 
         }}
       />
-      <Image source={{ uri: product.image || defaultPizzaImage }}
-        style={styles.image} />
+          <RemoteImage 
+                            path={product.image}
+                            fallback={defaultPizzaImage}
+                            style={styles.image}
+                            resizeMode="contain"
+                            />
       <Text style={styles.title}>
         {product.name}
       </Text>

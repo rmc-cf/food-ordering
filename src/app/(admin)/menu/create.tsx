@@ -2,10 +2,15 @@ import { defaultPizzaImage } from '@/assets/data/products'
 import { useDeleteProduct, useInsertProduct, useProduct, useUpdateProduct } from '@/src/api/products'
 import Button from '@/src/components/custom/Button'
 import Colors from '@/src/constants/Colors'
+import { supabase } from '@/src/lib/supabase'
+import { randomUUID } from 'expo-crypto'
 import * as ImagePicker from 'expo-image-picker'
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router'
 import React, { useEffect, useState } from 'react'
 import { Alert, Image, StyleSheet, Text, TextInput, View } from 'react-native'
+
+import { decode } from 'base64-arraybuffer'
+import * as FileSystem from 'expo-file-system'
 const CreateProductScreen = () => {
        const [name, setName] = useState('')
        const [price, setPrice] = useState('')
@@ -53,21 +58,22 @@ const CreateProductScreen = () => {
        }
        const onSubmit = () => {
               if (isUpdating) {
-                     onUpdateCreate()
+                     onUpdate()
               } else {
                      onCreate()
               }
        }
-       const onUpdateCreate = () => {
+       const onUpdate =async () => {
               if (!validateInput()) {
                      return;
               }
+              const imagePath = await uploadImage()
               //resolve the database
               updateProduct({
                      id,
                      name,
                      price: parseFloat(price),
-                     image
+                     image:imagePath
               },
                      {
                             onSuccess: () => {
@@ -77,12 +83,13 @@ const CreateProductScreen = () => {
                      }
               )
        }
-       const onCreate = () => {
+       const onCreate = async() => {
               if (!validateInput()) {
                      return;
               }
+              const imagePath  = await uploadImage()
               insertProduct(
-                     { name, price: parseFloat(price), image },
+                     { name, price: parseFloat(price), image:imagePath },
                      {
                             onSuccess: () => {
                                    resetFields()
@@ -101,7 +108,6 @@ const CreateProductScreen = () => {
                      quality: 1,
               });
 
-              console.log(result);
 
               if (!result.canceled) {
                      setImage(result.assets[0].uri);
@@ -126,6 +132,24 @@ const CreateProductScreen = () => {
                             onPress: onDelete
                      }
               ])
+       }
+
+       const uploadImage = async()=>{
+              if(!image?.startsWith("file://")){
+                     return;
+              }
+              const base64 = await FileSystem.readAsStringAsync(image,{
+                     encoding:'base64'
+              })
+              const filePath = `${randomUUID()}.png`
+              const contentType = 'image/png'
+              const {data,error} = await supabase.storage
+              .from('product-images')
+              .upload(filePath,decode(base64),{contentType})
+              if(data){
+                     return data.path
+              }
+
        }
        return (
               <View style={styles.container}>
